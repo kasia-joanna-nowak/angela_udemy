@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 posts = requests.get("https://api.npoint.io/c790b4d5cab58020d391").json()
 
-@app.route('/')
+@app.route('/home')
 def get_all_posts():
     return render_template("index.html", all_posts=posts)
 
