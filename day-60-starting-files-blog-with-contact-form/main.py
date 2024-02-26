@@ -43,7 +43,7 @@ def show_post(index):
     return render_template("post.html", post=requested_post)
 
 def send_email(name, email, phone, message):
-        email_message = f"Subject:New Message\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage:{message}"
+        email_message = f"Topic:New Message\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage:{message}"
         with smtplib.SMTP("smtp.gmail.com",port=465) as connection:
             connection.starttls()
             connection.login(OWN_EMAIL, OWN_PASSWORD)
