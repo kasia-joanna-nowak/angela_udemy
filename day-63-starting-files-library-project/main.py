@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 from wtforms import StringField, SubmitField, SelectField
-from wtforms.validators import DataRequired, URL
+from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
+from flask_bootstrap import Bootstrap
 
 
 
@@ -29,11 +30,13 @@ def add():
             new_book = {
             "title": request.form["book"],
             "author":  request.form["author"],
-            "rating": request.form["rating"]}
-            
+            "rating": request.form["rating"]
+            }
+
             all_books.append(new_book)
             return redirect(url_for('home'))
         return render_template('add.html')
+       
 
 
 if __name__ == "__main__":
