@@ -30,16 +30,16 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    result = db.session.execute(db.select(Book).order_by(Book.title)).scalars()
+    result = db.session.execute(db.select(Book).order_by(Book.title))
+    all_books = result.scalars()
 
-    return render_template('index.html',books=result)
+    return render_template('index.html',books=all_books)
 
 
 @app.route("/add", methods=["GET", "POST"])
 def add():
     if request.method == "POST":
         new_book = Book(
-
             title=request.form["title"],
             author=request.form["author"],
             rating=request.form["rating"]
@@ -49,6 +49,15 @@ def add():
         return redirect(url_for('home'))
     return render_template('add.html')
 
+@app.route("/edit/<id>", methods=["GET", "POST"])
+def edit(id):
+    book_to_update = db.session.execute(db.select(Book).where(Book.id == id)).scalar()
+    if request.method == "POST":
+        new_rating = request.form
+        book_to_update.rating = new_rating['rating']
+        db.session.commit()
+        return redirect(url_for('home'))
+    return render_template('edit.html', id=id, title=book_to_update.title, rating=book_to_update.rating)
 
        
 

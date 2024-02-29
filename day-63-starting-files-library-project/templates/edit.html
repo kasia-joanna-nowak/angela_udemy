@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+
+    <p>Book Name: {{ title }}</p>
+    <br>
+    <p>Current rating: {{ rating }}</p>
+    <br>
+    <form action="/edit/{{ id }}" method="POST">
+          <input type="text" id="rating" placeholder="new rating" name="rating"/>
+          <button type="submit">Change rating</button>
+    </form>
+  </body>
+</html>
+

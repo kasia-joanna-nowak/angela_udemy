@@ -12,11 +12,14 @@
 
     <ul>
       {% for book in books %}
-      <li> {{book.title}} - {{book.author}} - {{book.rating}}/10 </li>
+      <li> {{book.title}} - {{book.author}} - {{book.rating}}/10 
+      
+      <a href="{{ url_for('edit', id = book.id) }}">Editing Raiting</a>
+      
+    </li>
       {% endfor %}
     </ul>
   
-
     <a href="{{ url_for('add') }}">Add New Book</a>
   </body>
 </html>
