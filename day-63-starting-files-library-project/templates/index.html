@@ -12,7 +12,7 @@
 
     <ul>
       {% for book in books %}
-      <li> {{ book['title'] }} - {{ book['author'] }} - {{ book['rating'] }} </li>
+      <li> {{book.title}} - {{book.author}} - {{book.rating}}/10 </li>
       {% endfor %}
     </ul>
   
