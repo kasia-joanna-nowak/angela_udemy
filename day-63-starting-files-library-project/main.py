@@ -28,12 +28,21 @@ with app.app_context():
     db.create_all()
 
 
-@app.route('/')
+@app.route('/', methods = ["POST", "GET"])
 def home():
     result = db.session.execute(db.select(Book).order_by(Book.title))
     all_books = result.scalars()
-
     return render_template('index.html',books=all_books)
+
+@app.route('/delete/<id>', methods=["GET", "POST"])
+def delete(id):
+    book_id = id
+    book_to_delete = db.get_or_404(Book, book_id)
+    db.session.delete(book_to_delete)
+    db.session.commit()
+    return redirect(url_for('home'))
+        
+
 
 
 @app.route("/add", methods=["GET", "POST"])
