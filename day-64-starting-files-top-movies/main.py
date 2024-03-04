@@ -49,9 +49,11 @@ class Movie(db.Model):
 with app.app_context():
     db.create_all()
 
-@app.route("/")
+@app.route("/", methods = ["POST", "GET"])
 def home():
-    return render_template("index.html")
+    movies = db.session.execute(db.select(Movie))
+    all_movies = movies.scalars()
+    return render_template("index.html", movies = all_movies)
 
 
 if __name__ == '__main__':
