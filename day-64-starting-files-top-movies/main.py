@@ -33,9 +33,19 @@ db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
 # CREATE TABLE
-class Movie(db.Model)
+class Movie(db.Model):
+  id:Mapped[int] = mapped_column(primary_key=True)
+  title:Mapped[str] = mapped_column(unique=True)
+  year :Mapped[int] = mapped_column(Integer)
+  description :Mapped[str] = mapped_column(String)
+  rating :Mapped[int] = mapped_column(Integer)
+  ranking:Mapped[int] = mapped_column(Integer)
+  description :Mapped[str] = mapped_column(String)
+  review:Mapped[str] = mapped_column(String)
+  img_url:Mapped[str] = mapped_column(String)
 
-
+with app.app_context():
+    db.create_all()
 
 @app.route("/")
 def home():
