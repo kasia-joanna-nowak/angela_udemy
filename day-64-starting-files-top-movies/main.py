@@ -29,10 +29,11 @@ Bootstrap5(app)
 class Base(DeclarativeBase):
   pass
 
+
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies-collection.db"
 db = SQLAlchemy(model_class=Base)
-
 db.init_app(app)
+
 
 # CREATE TABLE
 class Movie(db.Model):
@@ -49,11 +50,36 @@ class Movie(db.Model):
 with app.app_context():
     db.create_all()
 
+class RateForm(FlaskForm):
+   new_rating = StringField("Your Rating Out of 10 e.g. 7.5")
+   submit = SubmitField("Done")
+
+
 @app.route("/", methods = ["POST", "GET"])
 def home():
     movies = db.session.execute(db.select(Movie))
     all_movies = movies.scalars()
     return render_template("index.html", movies = all_movies)
+
+@app.route("/update", methods = ["POST", "GET"])
+def update_rating():
+  form=RateForm()
+  movie_id = request.args.get("id")
+  movie = db.get_or_404(Movie, movie_id)
+  if form.validate_on_submit():
+     movie.rating = form.rating.data
+     db.session.commit()
+     return redirect(url_for('home'))
+  return render_template("edit.html", movie=movie, form=form)
+
+
+@app.route("/delete", methods = ["POST", "GET"])
+def delete_movie():
+  movie_id = request.args.get("id")
+  movie = db.get_or_404(Movie, movie_id)
+  db.session.delete(movie)
+  db.session.commit()
+  return redirect(url_for("home"))
 
 
 if __name__ == '__main__':
