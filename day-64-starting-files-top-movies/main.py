@@ -26,9 +26,15 @@ app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap5(app)
 
 # CREATE DB
+class Base(DeclarativeBase):
+  pass
+db = SQLAlchemy(model_class=Base)
 
+db.init_app(app)
 
 # CREATE TABLE
+class Movie(db.Model)
+
 
 
 @app.route("/")
