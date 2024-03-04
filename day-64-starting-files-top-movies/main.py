@@ -28,6 +28,8 @@ Bootstrap5(app)
 # CREATE DB
 class Base(DeclarativeBase):
   pass
+
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies-collection.db"
 db = SQLAlchemy(model_class=Base)
 
 db.init_app(app)
