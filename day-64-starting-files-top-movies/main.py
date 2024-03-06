@@ -70,5 +70,9 @@ def delete_movie():
   return redirect(url_for("home"))
 
 
+@app.route("/add", methods = ["POST", "GET"])
+def add_new_movie():
+   return render_template("add.html")
+
 if __name__ == '__main__':
     app.run(debug=True)
