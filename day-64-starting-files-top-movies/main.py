@@ -8,10 +8,23 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 import requests
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap5(app)
+
+api_key = "7b9edf26f9e0b444273acdbff2ddafe9"
+
+
+url = "https://api.themoviedb.org/3/search/movie"
+
+headers = {
+    "accept": "application/json",
+    "Authorization": "Bearer 7b9edf26f9e0b444273acdbff2ddafe9"
+}
+
+response = requests.get(url, headers=headers)
+data = response.json()
+print(data)
 
 # CREATE DB
 class Base(DeclarativeBase):
@@ -35,8 +48,23 @@ class Movie(db.Model):
   review:Mapped[str] = mapped_column(String)
   img_url:Mapped[str] = mapped_column(String)
 
+
+new_movie = Movie(
+    title="Phone Booth",
+    year=2002,
+    description="Publicist Stuart Shepard finds himself trapped in a phone booth, pinned down by an extortionist's sniper rifle. Unable to leave or receive outside help, Stuart's negotiation with the caller leads to a jaw-dropping climax.",
+    rating=7.3,
+    ranking=10,
+    review="My favourite character was the caller.",
+    img_url="https://image.tmdb.org/t/p/w500/tjrX2oWRCM3Tvarz38zlZM7Uc10.jpg"
+)
+
+
+
 with app.app_context():
     db.create_all()
+    db.session.add(new_movie)
+    db.session.commit()
 
 class RateForm(FlaskForm):
    rating = StringField("Your Rating Out of 10 e.g. 7.5")
