@@ -49,22 +49,10 @@ class Movie(db.Model):
   img_url:Mapped[str] = mapped_column(String)
 
 
-new_movie = Movie(
-    title="Phone Booth",
-    year=2002,
-    description="Publicist Stuart Shepard finds himself trapped in a phone booth, pinned down by an extortionist's sniper rifle. Unable to leave or receive outside help, Stuart's negotiation with the caller leads to a jaw-dropping climax.",
-    rating=7.3,
-    ranking=10,
-    review="My favourite character was the caller.",
-    img_url="https://image.tmdb.org/t/p/w500/tjrX2oWRCM3Tvarz38zlZM7Uc10.jpg"
-)
-
 
 
 with app.app_context():
     db.create_all()
-    db.session.add(new_movie)
-    db.session.commit()
 
 class RateForm(FlaskForm):
    rating = StringField("Your Rating Out of 10 e.g. 7.5")
@@ -106,8 +94,15 @@ def delete_movie():
 def add_new_movie():
    form= AddMovie()
    if form.validate_on_submit():
-      db.session.commit()
-      return redirect(url_for('home'))
+      new_movie = Movie(
+         title = request.form["movie"]
+      )
+
+      response = requests.get(url = f"https://api.themoviedb.org/3/search/movie?query={new_movie.title}&api_key={api_key}")
+      data = response.json()
+      # db.session.add(new_movie)
+      # db.session.commit() 
+      return render_template("select.html", data=data["results"])
    return render_template("add.html", form=form)
 
 if __name__ == '__main__':
