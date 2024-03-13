@@ -38,15 +38,14 @@ db.init_app(app)
 
 # CREATE TABLE
 class Movie(db.Model):
-  id:Mapped[int] = mapped_column(primary_key=True)
-  title:Mapped[str] = mapped_column(unique=True)
-  year :Mapped[int] = mapped_column(Integer)
-  description :Mapped[str] = mapped_column(String)
-  rating :Mapped[int] = mapped_column(Integer,nullable=True)
-  ranking:Mapped[int] = mapped_column(Integer,nullable=True)
-  description :Mapped[str] = mapped_column(String)
-  review:Mapped[str] = mapped_column(String,nullable=True)
-  img_url:Mapped[str] = mapped_column(String)
+   id: Mapped[int] = mapped_column(Integer, primary_key=True)
+   title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
+   year: Mapped[int] = mapped_column(Integer, nullable=False)
+   description: Mapped[str] = mapped_column(String(500), nullable=False)
+   rating: Mapped[float] = mapped_column(Float, nullable=True)
+   ranking: Mapped[int] = mapped_column(Integer, nullable=True)
+   review: Mapped[str] = mapped_column(String(250), nullable=True)
+   img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
 
 with app.app_context():
@@ -68,11 +67,10 @@ def home():
     return render_template("index.html", movies = all_movies)
 
 
-@app.route("/update", methods = ["POST", "GET"])
-def update_rating():
+@app.route("/update/<id>", methods = ["POST", "GET"])
+def update_rating(id):
   form=RateForm()
-  movie_id = request.args.get("id")
-  movie = db.get_or_404(Movie, movie_id)
+  movie = db.get_or_404(Movie, id)
   if form.validate_on_submit():
      movie.rating = form.rating.data
      movie.review = form.review.data
@@ -99,8 +97,8 @@ def add_new_movie():
       )
       response = requests.get(url = f"https://api.themoviedb.org/3/search/movie?query={new_movie.title}&api_key={api_key}")
       data = response.json()
-      db.session.add(new_movie)
-      db.session.commit() 
+      # db.session.add(new_movie)
+      # db.session.commit() 
       return render_template("select.html", data=data["results"])
    return render_template("add.html", form=form)
 
