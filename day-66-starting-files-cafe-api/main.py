@@ -1,8 +1,10 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, render_template
+from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Boolean
-import random
+import random 
+import requests
 
 '''
 Install the required packages first: 
@@ -71,6 +73,14 @@ def get_random_cafe():
     "can_take_calls": random_cafe.can_take_calls,
     "coffee_price": random_cafe.coffee_price,
     })
+
+
+app.route("/all")
+def get_all_cafes():
+    cafes = db.session.execute(db.select(Cafe))
+    all_cafes = cafes.scalars().all()
+    return jsonify(all_cafes)
+    
 # HTTP POST - Create Record
 
 # HTTP PUT/PATCH - Update Record
