@@ -43,8 +43,6 @@ def delete(id):
     return redirect(url_for('home'))
         
 
-
-
 @app.route("/add", methods=["GET", "POST"])
 def add():
     if request.method == "POST":
