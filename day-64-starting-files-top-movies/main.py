@@ -16,15 +16,15 @@ api_key = "7b9edf26f9e0b444273acdbff2ddafe9"
 
 
 url = "https://api.themoviedb.org/3/search/movie"
+MOVIE_DB_INFO_URL = "https://api.themoviedb.org/3/movie"
+MOVIE_DB_IMAGE_URL = "https://image.tmdb.org/t/p/w500"
+
+
 
 headers = {
     "accept": "application/json",
     "Authorization": "Bearer 7b9edf26f9e0b444273acdbff2ddafe9"
 }
-
-response = requests.get(url, headers=headers)
-data = response.json()
-print(data)
 
 # CREATE DB
 class Base(DeclarativeBase):
@@ -42,20 +42,18 @@ class Movie(db.Model):
   title:Mapped[str] = mapped_column(unique=True)
   year :Mapped[int] = mapped_column(Integer)
   description :Mapped[str] = mapped_column(String)
-  rating :Mapped[int] = mapped_column(Integer)
-  ranking:Mapped[int] = mapped_column(Integer)
+  rating :Mapped[int] = mapped_column(Integer,nullable=True)
+  ranking:Mapped[int] = mapped_column(Integer,nullable=True)
   description :Mapped[str] = mapped_column(String)
-  review:Mapped[str] = mapped_column(String)
+  review:Mapped[str] = mapped_column(String,nullable=True)
   img_url:Mapped[str] = mapped_column(String)
-
-
 
 
 with app.app_context():
     db.create_all()
 
 class RateForm(FlaskForm):
-   rating = StringField("Your Rating Out of 10 e.g. 7.5")
+   rating = StringField("Your Rating Out of 10 e.g. 7.5" )
    review = StringField("Your Review")
    submit = SubmitField("Done")
 
@@ -69,6 +67,7 @@ def home():
     all_movies = movies.scalars()
     return render_template("index.html", movies = all_movies)
 
+
 @app.route("/update", methods = ["POST", "GET"])
 def update_rating():
   form=RateForm()
@@ -76,6 +75,7 @@ def update_rating():
   movie = db.get_or_404(Movie, movie_id)
   if form.validate_on_submit():
      movie.rating = form.rating.data
+     movie.review = form.review.data
      db.session.commit()
      return redirect(url_for('home'))
   return render_template("edit.html", movie=movie, form=form)
@@ -97,13 +97,29 @@ def add_new_movie():
       new_movie = Movie(
          title = request.form["movie"]
       )
-
       response = requests.get(url = f"https://api.themoviedb.org/3/search/movie?query={new_movie.title}&api_key={api_key}")
       data = response.json()
-      # db.session.add(new_movie)
-      # db.session.commit() 
+      db.session.add(new_movie)
+      db.session.commit() 
       return render_template("select.html", data=data["results"])
    return render_template("add.html", form=form)
+
+@app.route("/choose")
+def choose_movie():
+   movie_id = request.args.get("id")
+   if movie_id:
+      response = requests.get(url = f"https://api.themoviedb.org/3/movie/{movie_id}", params={"api_key":api_key})
+      data = response.json()
+      new_movie_info = Movie(
+         title = data["title"],
+         year=data["release_date"].split("-")[0],
+         img_url=f"{MOVIE_DB_IMAGE_URL}{data['poster_path']}",
+         description=data["overview"]
+      )
+      db.session.add(new_movie_info)
+      db.session.commit()
+      return redirect(url_for("update_rating", id=new_movie_info.id))
+      # return redirect(url_for("home", id=new_movie_info.movie_id))
 
 if __name__ == '__main__':
     app.run(debug=True)
