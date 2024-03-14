@@ -30,7 +30,7 @@ db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
 
-# Cafe TABLE Configuration
+
 class Cafe(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
@@ -55,7 +55,7 @@ def home():
 
 
 # HTTP GET - Read Record
-app.route("/random",methods=["GET"])
+@app.route("/random",methods=["GET"])
 def get_random_cafe():
     result = db.session.execute(db.select(Cafe))
     all_cafes = result.scalars().all()
@@ -75,11 +75,29 @@ def get_random_cafe():
     })
 
 
-app.route("/all")
+@app.route("/all",methods=["GET"])
 def get_all_cafes():
-    cafes = db.session.execute(db.select(Cafe))
+    cafes = db.session.execute(db.select(Cafe).order_by(Cafe.name))
     all_cafes = cafes.scalars().all()
-    return jsonify(all_cafes)
+    cafe_list = []
+    for cafe in all_cafes:
+        cafe_json = {
+            "id": cafe.id,
+            "name": cafe.name,
+            "map_url": cafe.map_url,
+            "img_url": cafe.img_url,
+            "location": cafe.location,
+            "has_sockets": cafe.has_sockets,
+            "has_toilet": cafe.has_toilet,
+            "has_wifi": cafe.has_wifi,
+            "can_take_calls": cafe.can_take_calls,
+            "seats": cafe.seats,
+            "coffee_price": cafe.coffee_price,
+        }
+        cafe_list.append(cafe_json)
+    return jsonify(cafes=cafe_list)
+    
+
     
 # HTTP POST - Create Record
 
