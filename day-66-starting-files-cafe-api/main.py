@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -7,6 +7,7 @@ import random
 import requests
 
 '''
+
 Install the required packages first: 
 Open the Terminal in PyCharm (bottom left). 
 
@@ -99,32 +100,34 @@ def get_all_cafes():
     
 @app.route("/search", methods=["GET"])
 def cafes_location():
-    query_location = requests.args.get("loc")
-    result = db.session.execute(db.select(Cafe).where(Cafe.location == query_location))
-    cafe_list = result.scalars().all()
+    query_location = request.args.get("loc")
+    result = db.session.execute(db.select(Cafe).where(Cafe.location==query_location))
+    result = result.scalars().first()
+
+    # return jsonify(cafe_list)
     
  
     # query = db.session.execute(db.select(Cafe).where(Cafe.location==loc))
     # result = query.scalars().all()
-    # if result:
-    #     return jsonify(cafe={
-    #     "name": result.name,
-    #     "map_url": result.map_url,
-    #     "img_url": result.img_url,
-    #     "location": result.location,
-    #     "seats": result.seats,
-    #     "has_toilet": result.has_toilet,
-    #     "has_wifi": result.has_wifi,
-    #     "has_sockets": result.has_sockets,
-    #     "can_take_calls": result.can_take_calls,
-    #     "coffee_price": result.coffee_price
-    #     })
-    # else:
-    #     return jsonify({
-    #     "error": {
-    #     "Not Found": "Sorry we don't have a cafe at that location."
-    #     }
-    #     })
+    if result:
+        return jsonify(cafe={
+        "name": result.name,
+        "map_url": result.map_url,
+        "img_url": result.img_url,
+        "location": result.location,
+        "seats": result.seats,
+        "has_toilet": result.has_toilet,
+        "has_wifi": result.has_wifi,
+        "has_sockets": result.has_sockets,
+        "can_take_calls": result.can_take_calls,
+        "coffee_price": result.coffee_price
+        })
+    else:
+        return jsonify({
+        "error": {
+        "Not Found": "Sorry we don't have a cafe at that location."
+        }
+        })
     
     
                                   
