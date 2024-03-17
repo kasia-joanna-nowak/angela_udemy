@@ -101,39 +101,58 @@ def get_all_cafes():
 @app.route("/search", methods=["GET"])
 def cafes_location():
     query_location = request.args.get("loc")
-    result = db.session.execute(db.select(Cafe).where(Cafe.location==query_location))
-    result = result.scalars().first()
+    cafe = db.session.execute(db.select(Cafe).where(Cafe.location==query_location))
+    cafes = cafe.scalars().all()
 
-    # return jsonify(cafe_list)
-    
- 
-    # query = db.session.execute(db.select(Cafe).where(Cafe.location==loc))
-    # result = query.scalars().all()
-    if result:
-        return jsonify(cafe={
-        "name": result.name,
-        "map_url": result.map_url,
-        "img_url": result.img_url,
-        "location": result.location,
-        "seats": result.seats,
-        "has_toilet": result.has_toilet,
-        "has_wifi": result.has_wifi,
-        "has_sockets": result.has_sockets,
-        "can_take_calls": result.can_take_calls,
-        "coffee_price": result.coffee_price
-        })
+    list_of_cafes = []
+    if cafes:
+        for cafe in cafes:
+            cafe_in_json={
+            "name": cafe.name,
+            "map_url": cafe.map_url,
+            "img_url": cafe.img_url,
+            "location": cafe.location,
+            "seats": cafe.seats,
+            "has_toilet": cafe.has_toilet,
+            "has_wifi": cafe.has_wifi,
+            "has_sockets": cafe.has_sockets,
+            "can_take_calls": cafe.can_take_calls,
+            "coffee_price": cafe.coffee_price
+            }
+            list_of_cafes.append(cafe_in_json)
+        return jsonify(list_of_cafes)
+
     else:
         return jsonify({
-        "error": {
-        "Not Found": "Sorry we don't have a cafe at that location."
-        }
-        })
-    
+            "error": {
+            "Not Found": "Sorry we don't have a cafe at that location."
+            }
+            })
+        
     
                                   
     
 
 # HTTP POST - Create Record
+@app.route("/add", methods = ["POST"])
+def add_new_cafe():
+    new_cafe = Cafe(
+        name=request.form.get("name"),
+        map_url=request.form.get("map_url"),
+        img_url=request.form.get("img_url"),
+        location=request.form.get("loc"),
+        has_sockets=bool(request.form.get("sockets")),
+        has_toilet=bool(request.form.get("toilet")),
+        has_wifi=bool(request.form.get("wifi")),
+        can_take_calls=bool(request.form.get("calls")),
+        seats=request.form.get("seats"),
+        coffee_price=request.form.get("coffee_price"),
+
+
+    )
+    # db.session.add(new_cafe)
+    db.session.commit()
+    return jsonify(response={"success": "Successfully added the new cafe."})
 
 # HTTP PUT/PATCH - Update Record
 
