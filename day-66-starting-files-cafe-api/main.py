@@ -131,7 +131,7 @@ def cafes_location():
 
 
 # HTTP POST - Create Record
-@app.route("/add", methods = ["POST"])
+@app.route("/add", methods = ["GET","POST"])
 def add_new_cafe():
     new_cafe = Cafe(
         name=request.form.get("name"),
@@ -145,10 +145,9 @@ def add_new_cafe():
         seats=request.form.get("seats"),
         coffee_price=request.form.get("coffee_price"),
 
-
     )
-    # db.session.add(new_cafe)
-    db.session.commit()
+    db.session.add(new_cafe)
+    # db.session.commit()
     return jsonify(response={"success": "Successfully added the new cafe."})
 
 # HTTP PUT/PATCH - Update Record
