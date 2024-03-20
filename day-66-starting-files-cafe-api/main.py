@@ -128,10 +128,7 @@ def cafes_location():
             "Not Found": "Sorry we don't have a cafe at that location."
             }
             })
-        
-    
-                                  
-    
+
 
 # HTTP POST - Create Record
 @app.route("/add", methods = ["POST"])
@@ -156,8 +153,30 @@ def add_new_cafe():
 
 # HTTP PUT/PATCH - Update Record
 
+@app.route("/update-price/<int:cafe_id>", methods =["GET","PATCH"])
+def updating_cafe_price(cafe_id):
+    new_price = request.args.get("new_price")
+    selected_cafe = db.session.get(Cafe, cafe_id)
+    if selected_cafe:
+       selected_cafe.coffee_price= new_price
+       db.session.commit()
+       return jsonify(response={"success": "Successfully updated the price."})
+    else:
+        return jsonify(error={"Not Found": "Sorry a cafe with that id was not found in the database."})
+
 # HTTP DELETE - Delete Record
-
-
+@app.route("/report-closed/<cafe_id>", methods=["GET", "POST"])
+def delete_cafe(cafe_id):
+    api_key = request.args.get("api_key")
+    if api_key == "topsecretapikey":
+        cafe_delete = db.session.get(Cafe, cafe_id)
+        if cafe_delete:
+            db.session.delete(cafe_delete)
+            db.session.commit()
+            return jsonify(response={"success": "Successfully deleted the cafe from the database."}), 200
+        else: 
+            return jsonify(error={"Not Found": "Sorry a cafe with that id was not found in the database."})
+    else:
+        return jsonify(error={"Forbidden": "Sorry, that's not allowed. Make sure you have the correct api_key."}), 403
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host="0.0.0.0")
