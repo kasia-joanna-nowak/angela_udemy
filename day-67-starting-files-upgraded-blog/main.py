@@ -8,11 +8,15 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL
 from flask_ckeditor import CKEditor, CKEditorField
 from datetime import date
+import datetime
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap5(app)
+ckeditor = CKEditor(app)
+
+
 
 # CREATE DATABASE
 class Base(DeclarativeBase):
@@ -32,6 +36,13 @@ class BlogPost(db.Model):
     author: Mapped[str] = mapped_column(String(250), nullable=False)
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
+class CreatePostForm(FlaskForm):
+    title = StringField("Blog Post Title", validators=[DataRequired()])
+    subtitle = StringField("Subtitle", validators=[DataRequired()])
+    author = StringField("Your Name", validators=[DataRequired()])
+    img_url = StringField("Blog Image URL", validators=[DataRequired(), URL()])
+    body = CKEditorField("Blog Content", validators=[DataRequired()])
+    submit = SubmitField("Submit Post")
 
 with app.app_context():
     db.create_all()
@@ -55,9 +66,21 @@ def show_post(post_id):
 # TODO: add_new_post() to create a new blog post
 @app.route("/new-post", methods = ["GET", "POST"])
 def add_new_post():
-    if request.me
-    
-    return render_template("make-post.html")
+    form = CreatePostForm()
+    if form.validate_on_submit():
+        new_post=BlogPost(
+        title=form.title.data,
+        subtitle=form.subtitle.data,
+        date=datetime.date.today().strftime("%B %d,%Y"),
+        body=form.body.data,
+        img_url=form.img_url.data,
+        author=form.author.data
+        )
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect(url_for("get_all_posts")) 
+    return render_template("make-post.html", form=form)
+
 
 # TODO: edit_post() to change an existing blog post
 
@@ -76,3 +99,4 @@ def contact():
 
 if __name__ == "__main__":
     app.run(debug=True, port=5003)
+
