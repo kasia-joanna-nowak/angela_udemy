@@ -6,7 +6,10 @@ from sqlalchemy import Integer, String
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret-key-goes-here'
+login_manager = LoginManager()
+login_manager.init_app(app)
+app.config['SECRET_KEY'] = 'nOkMxqG8FLTb$@p843vSNY0'
+
 
 # CREATE DATABASE
 class Base(DeclarativeBase):
@@ -25,6 +28,10 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.get_or_404(User, user_id)
 
 @app.route('/')
 def home():
