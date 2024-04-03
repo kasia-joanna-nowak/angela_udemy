@@ -52,19 +52,36 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
+
+        login_user(new_user)
         
         return render_template("secrets.html",name = request.form.get("name") )
 
     return render_template("register.html")
 
-@app.route('/login')
+@app.route('/login',  methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        # Find user by email entered.
+        result = db.session.execute(db.select(User).where(User.email == email))
+        user = result.scalar()
+
+        # Check stored password hash against entered password hashed.
+        if user:
+            if check_password_hash(user.password, password):
+                login_user(user)
+            return redirect(url_for('secrets'))
+
+
     return render_template("login.html")
 
 
 @app.route('/secrets')
+@login_required
 def secrets():
-    
+
     return render_template("secrets.html")
 
 
@@ -74,6 +91,7 @@ def logout():
 
 
 @app.route('/download')
+@login_required
 def download():
     return send_from_directory(directory='static', path="files/cheat_sheet.pdf", as_attachment=True)
 
