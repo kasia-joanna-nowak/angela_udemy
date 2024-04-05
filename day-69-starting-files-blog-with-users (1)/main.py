@@ -10,7 +10,7 @@ from sqlalchemy import Integer, String, Text
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
-from forms import CreatePostForm, RegisterForm
+from forms import CreatePostForm, RegisterForm, LoginForm
 
 
 '''
@@ -64,6 +64,8 @@ class User(UserMixin, db.Model):
     password: Mapped[str] = mapped_column(String(100))
     name: Mapped[str] = mapped_column(String(100))
 
+
+
 with app.app_context():
     db.create_all()
 
@@ -97,8 +99,19 @@ def load_user(user_id):
 # TODO: Retrieve a user from the database based on their email. 
 @app.route('/login' , methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+        result = db.session.execute(db.select(User).where(User.email == email))
+        user = result.scalar()
+
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for("get_all_posts"))
     
-    return render_template("login.html")
+    
+    return render_template("login.html", form=form)
 
 
 @app.route('/logout')
