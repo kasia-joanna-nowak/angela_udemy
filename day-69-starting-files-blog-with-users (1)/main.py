@@ -83,7 +83,8 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-        return render_template("register.html")
+        return redirect(url_for("get_all_posts"))
+     return render_template("register.html", form=form)
 
 
 # TODO: Retrieve a user from the database based on their email. 
