@@ -67,7 +67,7 @@ with app.app_context():
 
 
 # TODO: Use Werkzeug to hash the user's password when creating a new user.
-@app.route('/register')
+@app.route('/register', methods = ["GET", "POST"])
 def register():
      form = RegisterForm()
      if form.validate_on_submit():
