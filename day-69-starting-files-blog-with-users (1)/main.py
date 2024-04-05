@@ -41,6 +41,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 # CONFIGURE TABLES
 class BlogPost(db.Model):
@@ -69,8 +71,8 @@ with app.app_context():
 # TODO: Use Werkzeug to hash the user's password when creating a new user.
 @app.route('/register', methods = ["GET", "POST"])
 def register():
-     form = RegisterForm()
-     if form.validate_on_submit():
+    form = RegisterForm()
+    if form.validate_on_submit():
         hash_and_salted_password = generate_password_hash(
             form.password.data,
             method='pbkdf2:sha256',
@@ -83,12 +85,19 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-        return render_template("register.html")
+        return redirect(url_for("get_all_posts"))
+    return render_template("register.html", form=form)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 
 # TODO: Retrieve a user from the database based on their email. 
-@app.route('/login')
+@app.route('/login' , methods=['GET', 'POST'])
 def login():
+    
     return render_template("login.html")
 
 
