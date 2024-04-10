@@ -87,13 +87,14 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
+        login_user(new_user)
         return redirect(url_for("get_all_posts"))
     return render_template("register.html", form=form)
 
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    return db.get_or_404(User, user_id)
 
 
 # TODO: Retrieve a user from the database based on their email. 
@@ -119,7 +120,7 @@ def logout():
     return redirect(url_for('get_all_posts'))
 
 
-@app.route('/')
+@app.route('/', methods= ["GET", "POST"])
 def get_all_posts():
     result = db.session.execute(db.select(BlogPost))
     posts = result.scalars().all()
