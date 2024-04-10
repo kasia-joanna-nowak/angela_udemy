@@ -75,6 +75,11 @@ with app.app_context():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
+        result = db.session.execute(db.select(User).where(User.email == form.email.data ))
+        user = result.scalar()
+        if user:
+            flash("You've already signed up with that email, log in instead!")
+            return redirect(url_for('login'))
         hash_and_salted_password = generate_password_hash(
             form.password.data,
             method='pbkdf2:sha256',
@@ -107,9 +112,18 @@ def login():
         result = db.session.execute(db.select(User).where(User.email == email))
         user = result.scalar()
 
-        if user and check_password_hash(user.password, password):
-            login_user(user)
+        if not user :
+            flash("Email does not exists!")
+            return redirect(url_for('login'))
+
+        if user: 
+            if check_password_hash(user.password, password):
+                login_user(user)
+            else: 
+                flash("Password incorrect!")
+                return redirect(url_for('login'))
             return redirect(url_for("get_all_posts"))
+        
     
     
     return render_template("login.html", form=form)
