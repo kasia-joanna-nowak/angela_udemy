@@ -8,7 +8,7 @@ COPY . .
 
 EXPOSE 5001
 
-CMD ["Flask", "run", "--host=0.0.0.0", "--port=5001"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5001", "main:app"]
 
 
 
