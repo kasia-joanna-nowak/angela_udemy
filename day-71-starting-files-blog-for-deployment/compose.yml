@@ -1,4 +1,4 @@
-version:  "25.0.3"
+version:  "3.12"
 services:
   mlapp:
     container_name: blog_app
@@ -7,4 +7,4 @@ services:
       - "5001:5001"
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile"
