@@ -1,8 +1,8 @@
 version:  "25.0.3"
-
 services:
-  webapp:
-    image: python-restapi_app_for_dep
+  mlapp:
+    container_name: blog_app
+    image: nowakkasia/blog_app
     ports:
       - "5001:5001"
     build:
